@@ -77,7 +77,7 @@ namespace GadrocsWorkshop.Helios.Interfaces.Falcon.Gauges.Textures
 
                 int offset = (surfaceDesc.lPitch * (int)_display.TextureRect.Y) + ((int)_display.TextureRect.X * (surfaceDesc.ddpfPixelFormat.dwRGBBitCount / 8));
 
-                BitmapSource image = BitmapSource.Create((int)_display.TextureRect.Width,
+                BitmapSource image = MakeTransparentBitmap(BitmapSource.Create((int)_display.TextureRect.Width,
                                                          (int)_display.TextureRect.Height,
                                                          96,
                                                          96,
@@ -85,7 +85,7 @@ namespace GadrocsWorkshop.Helios.Interfaces.Falcon.Gauges.Textures
                                                          null,
                                                          _display.TextureMemory.GetPointer(offset + 4 + surfaceDesc.dwSize),
                                                          surfaceDesc.lPitch * (int)_display.TextureRect.Height,
-                                                         surfaceDesc.lPitch);
+                                                         surfaceDesc.lPitch), Colors.Black);
 
                 brush = new ImageBrush(image);
                 _defaultImage = new ImageBrush(image);
@@ -96,6 +96,42 @@ namespace GadrocsWorkshop.Helios.Interfaces.Falcon.Gauges.Textures
             }
             return brush;
         }
+
+
+        BitmapSource MakeTransparentBitmap(BitmapSource sourceImage, Color transparentColor)
+        {
+            if (sourceImage.Format != PixelFormats.Bgra32) //if input is not ARGB format convert to ARGB firstly
+            {
+                sourceImage = new FormatConvertedBitmap(sourceImage, PixelFormats.Bgra32, null, 0.0);
+            }
+
+            int stride = (sourceImage.PixelWidth * sourceImage.Format.BitsPerPixel) / 8;
+
+            byte[] pixels = new byte[sourceImage.PixelHeight * stride];
+
+            sourceImage.CopyPixels(pixels, stride, 0);
+
+            byte red = transparentColor.R;
+            byte green = transparentColor.G;
+            byte blue = transparentColor.B;
+            for (int i = 0; i < sourceImage.PixelHeight * stride; i += (sourceImage.Format.BitsPerPixel / 8))
+            {
+
+                // set transparency color
+
+                if (pixels[i] == blue
+                && pixels[i + 1] == green
+                && pixels[i + 2] == red)
+                {
+                    pixels[i + 3] = 0;
+                }
+
+            }
+
+            BitmapSource newImage = BitmapSource.Create(sourceImage.PixelWidth, sourceImage.PixelHeight,sourceImage.DpiX, sourceImage.DpiY, PixelFormats.Bgra32, sourceImage.Palette, pixels, stride);
+            return newImage;
+        }
+
 
         protected override void OnRefresh()
         {
