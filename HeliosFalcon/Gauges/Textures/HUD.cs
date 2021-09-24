@@ -14,7 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
+using System.ComponentModel;
+using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Xml;
 using GadrocsWorkshop.Helios.ComponentModel;
 
 namespace GadrocsWorkshop.Helios.Interfaces.Falcon.Gauges.Textures
@@ -23,6 +28,11 @@ namespace GadrocsWorkshop.Helios.Interfaces.Falcon.Gauges.Textures
     public class HUD : FalconTextureDisplay
     {
         private static readonly Rect _defaultRect = new Rect(5, 5, 255, 255);
+        
+        /// <summary>
+        /// backing field for HUD background transparency
+        /// </summary>
+        private bool _transparency;
 
         public HUD()
             : base("HUD", new Size(255, 255))

@@ -41,6 +41,7 @@ namespace GadrocsWorkshop.Helios.Interfaces.Falcon.Gauges.Textures
         private SharedMemory _textureMemory;
         private SharedMemory _sharedMemory2;
         private FlightData2 _lastFlightData2;
+        private bool _transparency;
 
         protected FalconTextureDisplay(string name, Size defaultSize)
             : base(name, defaultSize)
@@ -92,6 +93,21 @@ namespace GadrocsWorkshop.Helios.Interfaces.Falcon.Gauges.Textures
                 {
                     return DefaultRect;
                 }
+            }
+        }
+
+        public bool TransparencyEnabled
+        {
+            get => _transparency;
+            set
+            {
+                if (_transparency == value)
+                {
+                    return;
+                }
+                bool oldValue = _transparency;
+                _transparency = value;
+                OnPropertyChanged(nameof(TransparencyEnabled), oldValue, value, true);
             }
         }
 
@@ -255,5 +271,16 @@ namespace GadrocsWorkshop.Helios.Interfaces.Falcon.Gauges.Textures
             // No-Op
         }
 
+        public override void WriteXml(System.Xml.XmlWriter writer)
+        {
+            base.WriteXml(writer);
+            writer.WriteElementString("TransparentBackground", TransparencyEnabled.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        }
+
+        public override void ReadXml(System.Xml.XmlReader reader)
+        {
+            base.ReadXml(reader);
+            TransparencyEnabled = bool.Parse(reader.ReadElementString("TransparentBackground"));
+        }
     }
 }

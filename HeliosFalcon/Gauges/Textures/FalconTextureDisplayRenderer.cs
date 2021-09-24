@@ -77,7 +77,7 @@ namespace GadrocsWorkshop.Helios.Interfaces.Falcon.Gauges.Textures
 
                 int offset = (surfaceDesc.lPitch * (int)_display.TextureRect.Y) + ((int)_display.TextureRect.X * (surfaceDesc.ddpfPixelFormat.dwRGBBitCount / 8));
 
-                BitmapSource image = MakeTransparentBitmap(BitmapSource.Create((int)_display.TextureRect.Width,
+                BitmapSource image = BitmapSource.Create((int)_display.TextureRect.Width,
                                                          (int)_display.TextureRect.Height,
                                                          96,
                                                          96,
@@ -85,7 +85,12 @@ namespace GadrocsWorkshop.Helios.Interfaces.Falcon.Gauges.Textures
                                                          null,
                                                          _display.TextureMemory.GetPointer(offset + 4 + surfaceDesc.dwSize),
                                                          surfaceDesc.lPitch * (int)_display.TextureRect.Height,
-                                                         surfaceDesc.lPitch), Colors.Black);
+                                                         surfaceDesc.lPitch);
+
+                if(_display.TransparencyEnabled)
+                {
+                    image = MakeTransparentBitmap(image);
+                }
 
                 brush = new ImageBrush(image);
                 _defaultImage = new ImageBrush(image);
@@ -98,7 +103,8 @@ namespace GadrocsWorkshop.Helios.Interfaces.Falcon.Gauges.Textures
         }
 
 
-        BitmapSource MakeTransparentBitmap(BitmapSource sourceImage, Color transparentColor)
+        //BitmapSource MakeTransparentBitmap(BitmapSource sourceImage, Color transparentColor)
+        BitmapSource MakeTransparentBitmap(BitmapSource sourceImage)
         {
             if (sourceImage.Format != PixelFormats.Bgra32) //if input is not ARGB format convert to ARGB firstly
             {
@@ -111,17 +117,30 @@ namespace GadrocsWorkshop.Helios.Interfaces.Falcon.Gauges.Textures
 
             sourceImage.CopyPixels(pixels, stride, 0);
 
-            byte red = transparentColor.R;
-            byte green = transparentColor.G;
-            byte blue = transparentColor.B;
+            /* byte red = transparentColor.R;
+             byte green = transparentColor.G;
+             byte blue = transparentColor.B;
+            */
+
+            byte red = (byte)20d;
+            byte green = (byte)20d;
+            byte blue = (byte)20d;
+
             for (int i = 0; i < sourceImage.PixelHeight * stride; i += (sourceImage.Format.BitsPerPixel / 8))
             {
 
                 // set transparency color
-
+                /*
                 if (pixels[i] == blue
                 && pixels[i + 1] == green
                 && pixels[i + 2] == red)
+                {
+                    pixels[i + 3] = 0;
+                }
+                */
+                if (pixels[i] <= blue
+                && pixels[i + 1] <= green
+                && pixels[i + 2] <= red)
                 {
                     pixels[i + 3] = 0;
                 }
