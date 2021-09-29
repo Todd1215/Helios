@@ -41,6 +41,10 @@ namespace GadrocsWorkshop.Helios.Interfaces.Falcon.Gauges.Textures
         private SharedMemory _textureMemory;
         private SharedMemory _sharedMemory2;
         private FlightData2 _lastFlightData2;
+
+        /// <summary>
+        /// backing field for background transparency
+        /// </summary>
         private bool _transparency;
 
         protected FalconTextureDisplay(string name, Size defaultSize)

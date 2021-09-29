@@ -28,11 +28,6 @@ namespace GadrocsWorkshop.Helios.Interfaces.Falcon.Gauges.Textures
     public class HUD : FalconTextureDisplay
     {
         private static readonly Rect _defaultRect = new Rect(5, 5, 255, 255);
-        
-        /// <summary>
-        /// backing field for HUD background transparency
-        /// </summary>
-        private bool _transparency;
 
         public HUD()
             : base("HUD", new Size(255, 255))

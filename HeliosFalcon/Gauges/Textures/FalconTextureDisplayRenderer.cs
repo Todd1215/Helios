@@ -89,7 +89,7 @@ namespace GadrocsWorkshop.Helios.Interfaces.Falcon.Gauges.Textures
 
                 if(_display.TransparencyEnabled)
                 {
-                    image = MakeTransparentBitmap(image);
+                    image = ImageTransparency(image);
                 }
 
                 brush = new ImageBrush(image);
@@ -102,11 +102,10 @@ namespace GadrocsWorkshop.Helios.Interfaces.Falcon.Gauges.Textures
             return brush;
         }
 
-
-        //BitmapSource MakeTransparentBitmap(BitmapSource sourceImage, Color transparentColor)
-        BitmapSource MakeTransparentBitmap(BitmapSource sourceImage)
+        BitmapSource ImageTransparency(BitmapSource sourceImage)
         {
-            if (sourceImage.Format != PixelFormats.Bgra32) //if input is not ARGB format convert to ARGB firstly
+            //Convert to usable format
+            if (sourceImage.Format != PixelFormats.Bgra32)
             {
                 sourceImage = new FormatConvertedBitmap(sourceImage, PixelFormats.Bgra32, null, 0.0);
             }
@@ -117,27 +116,14 @@ namespace GadrocsWorkshop.Helios.Interfaces.Falcon.Gauges.Textures
 
             sourceImage.CopyPixels(pixels, stride, 0);
 
-            /* byte red = transparentColor.R;
-             byte green = transparentColor.G;
-             byte blue = transparentColor.B;
-            */
-
+            // Set the target color
             byte red = (byte)20d;
             byte green = (byte)20d;
             byte blue = (byte)20d;
 
             for (int i = 0; i < sourceImage.PixelHeight * stride; i += (sourceImage.Format.BitsPerPixel / 8))
             {
-
-                // set transparency color
-                /*
-                if (pixels[i] == blue
-                && pixels[i + 1] == green
-                && pixels[i + 2] == red)
-                {
-                    pixels[i + 3] = 0;
-                }
-                */
+                // Set alpha if pixels is at or below target color value
                 if (pixels[i] <= blue
                 && pixels[i + 1] <= green
                 && pixels[i + 2] <= red)
